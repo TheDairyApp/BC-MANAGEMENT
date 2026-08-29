@@ -1,0 +1,68 @@
+:root {
+    --bg-color: #121212;
+    --surface-color: #1e1e1e;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --accent-color: #6366f1;
+    --accent-hover: #4f46e5;
+    --border-color: #333;
+    --danger: #ef4444;
+    --success: #22c55e;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+
+body { background-color: var(--bg-color); color: var(--text-primary); }
+
+.hidden { display: none !important; }
+
+/* Layout */
+.screen { min-height: 100vh; }
+.layout { display: flex; }
+
+.sidebar {
+    width: 250px;
+    background-color: var(--surface-color);
+    border-right: 1px solid var(--border-color);
+    padding: 20px;
+}
+
+.sidebar h2 { margin-bottom: 30px; font-size: 1.5rem; }
+.sidebar a { display: block; padding: 10px; color: var(--text-secondary); text-decoration: none; border-radius: 6px; }
+.sidebar a.active, .sidebar a:hover { background-color: var(--accent-color); color: #fff; }
+
+.content { flex: 1; padding: 40px; }
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+
+/* Components */
+button {
+    padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;
+}
+button.primary { background-color: var(--accent-color); color: white; }
+button.secondary { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
+input {
+    width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px;
+    background-color: var(--bg-color); border: 1px solid var(--border-color); color: white;
+}
+
+/* Grid & Cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.card {
+    background-color: var(--surface-color); padding: 20px; border-radius: 10px; border: 1px solid var(--border-color);
+}
+.card h3 { margin-bottom: 10px; }
+.card p { color: var(--text-secondary); margin-bottom: 5px; font-size: 0.9rem; }
+.balance.positive { color: var(--success); }
+.balance.negative { color: var(--danger); }
+
+/* Modals */
+.modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    display: flex; align-items: center; justify-content: center;
+}
+.modal-content { background-color: var(--surface-color); padding: 30px; border-radius: 10px; width: 400px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+/* Auth Box */
+.auth-box { max-width: 400px; margin: 100px auto; padding: 40px; background: var(--surface-color); border-radius: 10px; text-align: center; }
+.auth-box h2 { margin-bottom: 20px; }
