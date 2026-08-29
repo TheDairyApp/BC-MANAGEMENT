@@ -13,7 +13,7 @@ const DB = {
 
     // Initialize & fetch from Supabase to true up the cache
     async init() {
-        const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) return false;
         
         this.user = session.user;
@@ -23,8 +23,8 @@ const DB = {
 
     async syncFromServer() {
         const [bcsRes, txRes] = await Promise.all([
-            supabase.from('bcs').select('*').order('created_at', { ascending: false }),
-            supabase.from('transactions').select('*').order('transaction_date', { ascending: false })
+            supabaseClient.from('bcs').select('*').order('created_at', { ascending: false }),
+supabaseClient.from('transactions').select('*').order('transaction_date', { ascending: false })
         ]);
 
         if (bcsRes.data) this.cache.bcs = bcsRes.data;
@@ -45,13 +45,17 @@ const DB = {
             created_at: new Date().toISOString() 
         };
 
+        
+
+
+
         // 1. Update local cache immediately
         this.cache.bcs.unshift(newBC);
         this._persist();
         window.dispatchEvent(new Event('db_updated'));
 
         // 2. Background sync to Supabase
-        const { data, error } = await supabase.from('bcs').insert([newBC]).select().single();
+        const { data, error } = await supabaseClient.from('bcs').insert([newBC]).select().single();
         
         if (error) {
             console.error('Failed to sync BC:', error);

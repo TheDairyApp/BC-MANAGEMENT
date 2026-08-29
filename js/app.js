@@ -38,7 +38,7 @@ window.addEventListener('db_updated', () => {
 
 // Auth Listeners
 document.getElementById('login-btn').addEventListener('click', async () => {
-    const { error } = await supabase.auth.signInWithPassword({
+   const { error } = await supabaseClient.auth.signInWithPassword({
         email: emailInput.value, password: passwordInput.value
     });
     if (error) alert(error.message);
@@ -46,7 +46,7 @@ document.getElementById('login-btn').addEventListener('click', async () => {
 });
 
 document.getElementById('signup-btn').addEventListener('click', async () => {
-    const { error } = await supabase.auth.signUp({
+    const { error } = await supabaseClient.auth.signUp({
         email: emailInput.value, password: passwordInput.value
     });
     if (error) alert(error.message);
@@ -54,7 +54,7 @@ document.getElementById('signup-btn').addEventListener('click', async () => {
 });
 
 document.getElementById('logout-btn').addEventListener('click', async () => {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     DB.user = null;
     toggleScreens(false);
 });
