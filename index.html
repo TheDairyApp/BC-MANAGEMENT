@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BC Management</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="screen">
+        <div class="auth-box">
+            <h2>BC Ledger Login</h2>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <button id="login-btn">Login</button>
+            <button id="signup-btn" class="secondary">Sign Up</button>
+        </div>
+    </div>
+
+    <!-- App Screen -->
+    <div id="app-screen" class="screen hidden layout">
+        <aside class="sidebar">
+            <h2>BC Manager</h2>
+            <nav>
+                <a href="#" class="active">Dashboard</a>
+                <a href="#" id="logout-btn">Logout</a>
+            </nav>
+        </aside>
+        
+        <main class="content">
+            <header>
+                <h1>My Committees</h1>
+                <button id="add-bc-btn" class="primary">+ New BC</button>
+            </header>
+            
+            <div id="bc-list" class="grid">
+                <!-- BC Cards rendered here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Add BC Modal -->
+    <div id="bc-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Add New BC</h3>
+            <form id="bc-form">
+                <input type="text" id="bc-name" placeholder="Name (e.g. Ashraf Bhai)" required>
+                <input type="number" id="bc-installment" placeholder="Monthly Installment" required>
+                <input type="number" id="bc-months" placeholder="Total Months" required>
+                <input type="date" id="bc-start" required>
+                <div class="modal-actions">
+                    <button type="button" id="close-modal" class="secondary">Cancel</button>
+                    <button type="submit" class="primary">Save BC</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
