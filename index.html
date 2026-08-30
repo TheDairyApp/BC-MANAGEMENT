@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body class="theme-dark">
     <!-- Auth Screen -->
     <div id="auth-screen" class="screen">
         <div class="auth-box">
@@ -28,8 +28,9 @@
                 <a href="#" id="nav-reports">Monthly Reports</a>
                 <a href="#" id="logout-btn" style="margin-top: auto;">Logout</a>
             </nav>
+            <button id="theme-toggle-btn" class="secondary" style="margin-top:16px;">☀️</button>
         </aside>
-        
+
         <main class="content">
             <!-- DASHBOARD VIEW -->
             <div id="view-dashboard">
@@ -48,33 +49,69 @@
                         <h1 id="detail-title">BC Details</h1>
                         <p id="detail-subtitle" style="color: var(--text-secondary);"></p>
                     </div>
-                    <button id="receive-payout-btn" class="success-btn hidden">Log Payout Received</button>
+                    <div style="display:flex; gap:10px;">
+                        <button id="edit-bc-btn" class="secondary">Edit committee</button>
+                        <button id="delete-bc-btn" class="danger-btn">Delete BC</button>
+                    </div>
                 </header>
+
+                <div id="share-tabs" class="share-tabs hidden"></div>
+
                 <div class="stats-grid">
-                    <div class="stat-box"><h3>Running Balance</h3><p id="detail-balance"></p></div>
-                    <div class="stat-box"><h3>Installments</h3><p id="detail-progress"></p></div>
+                    <div class="stat-box"><h3>Balance</h3><p id="detail-balance"></p></div>
+                    <div class="stat-box"><h3>Progress</h3><p id="detail-progress"></p></div>
                     <div class="stat-box"><h3>End Date</h3><p id="detail-end"></p></div>
                 </div>
-                <h3 style="margin: 30px 0 15px 0;">Installment Timeline</h3>
+
+                <div id="share-actions" style="margin: 10px 0 20px;"></div>
+
+                <h3 style="margin: 10px 0 15px 0;">Installment Timeline</h3>
                 <div id="timeline" class="timeline"></div>
             </div>
 
             <!-- REPORTS VIEW -->
             <div id="view-reports" class="hidden">
                 <header>
-                    <h1>Monthly Cash Flow Reports</h1>
+                    <h1>Monthly Reports</h1>
                 </header>
+                <div class="filters-row">
+                    <div>
+                        <label>Committee</label>
+                        <select id="report-bc-select"></select>
+                    </div>
+                    <div>
+                        <label>View</label>
+                        <select id="report-share-select"></select>
+                    </div>
+                    <div>
+                        <label>From month</label>
+                        <input type="month" id="report-from-month">
+                    </div>
+                    <div>
+                        <label>To month</label>
+                        <input type="month" id="report-to-month">
+                    </div>
+                    <button id="report-clear-filter-btn" class="secondary">Clear filter</button>
+                </div>
                 <div class="table-container">
                     <table id="reports-table">
                         <thead>
                             <tr>
                                 <th>Month</th>
-                                <th>Total Paid Out</th>
-                                <th>Total Payouts Received</th>
-                                <th>Net Cash Flow</th>
+                                <th>Due</th>
+                                <th>Paid</th>
+                                <th>Balance</th>
                             </tr>
                         </thead>
                         <tbody id="reports-body"></tbody>
+                        <tfoot>
+                            <tr id="reports-total-row" class="total-row hidden">
+                                <td>Total</td>
+                                <td id="report-total-due"></td>
+                                <td id="report-total-paid"></td>
+                                <td id="report-total-balance"></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -87,14 +124,105 @@
             <h3>Add New BC</h3>
             <form id="bc-form">
                 <input type="text" id="bc-name" placeholder="Name (e.g. Ashraf Bhai)" required>
-                <input type="number" id="bc-installment" placeholder="Monthly Installment" required>
-                <input type="number" id="bc-months" placeholder="Total Months" required>
-                <input type="date" id="bc-start" required>
+                <div class="row-2">
+                    <input type="date" id="bc-start" required>
+                    <input type="number" id="bc-months" placeholder="Total Months" required>
+                </div>
+                <div class="row-2">
+                    <input type="number" id="bc-members" placeholder="Total Members" required>
+                    <input type="number" id="bc-installment" placeholder="Monthly Installment" required>
+                </div>
+                <label>Our shares in this committee</label>
+                <select id="bc-num-shares">
+                    <option value="1">1 share (single member)</option>
+                    <option value="2">2 shares (two members, opened separately)</option>
+                </select>
+                <input type="text" id="bc-share1-label" placeholder="Share 1 label" value="Share 1">
+                <div id="bc-share2-wrap" class="hidden">
+                    <input type="text" id="bc-share2-label" placeholder="Share 2 label" value="Share 2">
+                </div>
                 <div class="modal-actions">
                     <button type="button" id="close-modal" class="secondary">Cancel</button>
                     <button type="submit" class="primary">Save BC</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Edit Installment Modal -->
+    <div id="inst-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="inst-modal-title">Edit installment</h3>
+            <label>Due date</label>
+            <input type="date" id="inst-due-date">
+
+            <label>Payments (split into parts if paid in two installments)</label>
+            <div id="inst-payment-lines"></div>
+            <button type="button" id="inst-add-line-btn" class="secondary" style="margin-bottom:16px;">+ Add part payment for this month</button>
+
+            <label>Remarks for this month</label>
+            <textarea id="inst-remarks" rows="3" placeholder="Any notes about this month's payment..."></textarea>
+
+            <div style="display:flex; align-items:center; gap:8px; margin: 10px 0 16px;">
+                <input type="checkbox" id="inst-skipped" style="width:auto; margin:0;">
+                <label style="margin:0;">Mark this month as skipped (missed — will be paid next month)</label>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="inst-cancel-btn" class="secondary">Cancel</button>
+                <button type="button" id="inst-save-btn" class="primary">Save entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Open BC Modal -->
+    <div id="open-bc-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Mark BC opened</h3>
+            <label>Which month did the BC open (payout received)?</label>
+            <select id="open-bc-month"></select>
+
+            <div class="stats-grid" style="grid-template-columns: 1fr 1fr; margin: 16px 0;">
+                <div class="stat-box"><h3>Pool</h3><p id="open-bc-pool"></p></div>
+                <div class="stat-box"><h3>Auto payout</h3><p id="open-bc-payout-display">—</p></div>
+            </div>
+
+            <label>Payout amount received (auto-calculated, editable)</label>
+            <input type="number" id="open-bc-payout">
+
+            <p id="open-bc-note" style="color:var(--text-secondary); font-size:0.85rem; margin: 10px 0;"></p>
+
+            <div class="modal-actions">
+                <button type="button" id="open-bc-cancel-btn" class="secondary">Cancel</button>
+                <button type="button" id="open-bc-confirm-btn" class="primary">Confirm payout received</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Committee Modal -->
+    <div id="edit-bc-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Edit committee details</h3>
+            <label>Name</label>
+            <input type="text" id="edit-bc-name">
+            <div class="row-2">
+                <div><label>Start date</label><input type="date" id="edit-bc-start"></div>
+                <div><label>Total months</label><input type="number" id="edit-bc-months"></div>
+            </div>
+            <div class="row-2">
+                <div><label>Total members</label><input type="number" id="edit-bc-members"></div>
+                <div><label>Monthly installment</label><input type="number" id="edit-bc-installment"></div>
+            </div>
+            <label>Pool override (optional — leave blank for auto)</label>
+            <input type="number" id="edit-bc-pool-override">
+            <div style="display:flex; align-items:center; gap:8px; margin: 10px 0 16px;">
+                <input type="checkbox" id="edit-bc-ended" style="width:auto; margin:0;">
+                <label style="margin:0;">Mark committee as ended</label>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="edit-bc-cancel-btn" class="secondary">Cancel</button>
+                <button type="button" id="edit-bc-save-btn" class="primary">Save changes</button>
+            </div>
         </div>
     </div>
 
