@@ -13,7 +13,7 @@ const DB = {
 
     // Initialize & fetch from Supabase to true up the cache
     async init() {
-  const { data: { session } } = await supabaseClient.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) return false;
         
         this.user = session.user;
@@ -24,7 +24,7 @@ const DB = {
     async syncFromServer() {
         const [bcsRes, txRes] = await Promise.all([
             supabaseClient.from('bcs').select('*').order('created_at', { ascending: false }),
-supabaseClient.from('transactions').select('*').order('transaction_date', { ascending: false })
+            supabaseClient.from('transactions').select('*').order('transaction_date', { ascending: false })
         ]);
 
         if (bcsRes.data) this.cache.bcs = bcsRes.data;
@@ -44,10 +44,6 @@ supabaseClient.from('transactions').select('*').order('transaction_date', { asce
             user_id: this.user.id, 
             created_at: new Date().toISOString() 
         };
-
-        
-
-
 
         // 1. Update local cache immediately
         this.cache.bcs.unshift(newBC);
@@ -69,6 +65,35 @@ supabaseClient.from('transactions').select('*').order('transaction_date', { asce
             const index = this.cache.bcs.findIndex(b => b.id === tempId);
             if(index > -1) this.cache.bcs[index] = data;
             this._persist();
+        }
+    },
+
+    // Optimistic Add Transaction
+    async addTransaction(bcId, type, amount, dateStr, notes = '') {
+        const newTx = {
+            id: crypto.randomUUID(),
+            bc_id: bcId,
+            user_id: this.user.id,
+            type: type,
+            amount: amount,
+            transaction_date: dateStr,
+            notes: notes,
+            created_at: new Date().toISOString()
+        };
+
+        // Update local cache immediately
+        this.cache.transactions.push(newTx);
+        this._persist();
+        window.dispatchEvent(new Event('db_updated'));
+
+        // Background sync to Supabase
+        const { error } = await supabaseClient.from('transactions').insert([newTx]);
+        if (error) {
+            console.error('Failed to save transaction:', error);
+            this.cache.transactions = this.cache.transactions.filter(t => t.id !== newTx.id);
+            this._persist();
+            window.dispatchEvent(new Event('db_updated'));
+            alert('Failed to save payment. Reverted.');
         }
     },
 

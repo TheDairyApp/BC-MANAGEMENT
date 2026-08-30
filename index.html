@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BC Management</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -15,29 +14,69 @@
             <h2>BC Ledger Login</h2>
             <input type="email" id="email" placeholder="Email">
             <input type="password" id="password" placeholder="Password">
-            <button id="login-btn">Login</button>
+            <button id="login-btn" class="primary">Login</button>
             <button id="signup-btn" class="secondary">Sign Up</button>
         </div>
     </div>
 
-    <!-- App Screen -->
+    <!-- App Layout -->
     <div id="app-screen" class="screen hidden layout">
         <aside class="sidebar">
             <h2>BC Manager</h2>
             <nav>
-                <a href="#" class="active">Dashboard</a>
-                <a href="#" id="logout-btn">Logout</a>
+                <a href="#" id="nav-dashboard" class="active">Dashboard</a>
+                <a href="#" id="nav-reports">Monthly Reports</a>
+                <a href="#" id="logout-btn" style="margin-top: auto;">Logout</a>
             </nav>
         </aside>
         
         <main class="content">
-            <header>
-                <h1>My Committees</h1>
-                <button id="add-bc-btn" class="primary">+ New BC</button>
-            </header>
-            
-            <div id="bc-list" class="grid">
-                <!-- BC Cards rendered here -->
+            <!-- DASHBOARD VIEW -->
+            <div id="view-dashboard">
+                <header>
+                    <h1>My Committees</h1>
+                    <button id="add-bc-btn" class="primary">+ New BC</button>
+                </header>
+                <div id="bc-list" class="grid"></div>
+            </div>
+
+            <!-- DETAIL VIEW -->
+            <div id="view-detail" class="hidden">
+                <header>
+                    <div>
+                        <button id="back-btn" class="secondary" style="margin-bottom: 15px;">&larr; Back</button>
+                        <h1 id="detail-title">BC Details</h1>
+                        <p id="detail-subtitle" style="color: var(--text-secondary);"></p>
+                    </div>
+                    <button id="receive-payout-btn" class="success-btn hidden">Log Payout Received</button>
+                </header>
+                <div class="stats-grid">
+                    <div class="stat-box"><h3>Running Balance</h3><p id="detail-balance"></p></div>
+                    <div class="stat-box"><h3>Installments</h3><p id="detail-progress"></p></div>
+                    <div class="stat-box"><h3>End Date</h3><p id="detail-end"></p></div>
+                </div>
+                <h3 style="margin: 30px 0 15px 0;">Installment Timeline</h3>
+                <div id="timeline" class="timeline"></div>
+            </div>
+
+            <!-- REPORTS VIEW -->
+            <div id="view-reports" class="hidden">
+                <header>
+                    <h1>Monthly Cash Flow Reports</h1>
+                </header>
+                <div class="table-container">
+                    <table id="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Total Paid Out</th>
+                                <th>Total Payouts Received</th>
+                                <th>Net Cash Flow</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-body"></tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
