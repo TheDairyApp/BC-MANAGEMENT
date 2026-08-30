@@ -1,4 +1,5 @@
 // DOM Elements
+const appScreen = document.getElementById('app-screen');
 const views = {
     dashboard: document.getElementById('view-dashboard'),
     detail: document.getElementById('view-detail'),
@@ -11,6 +12,32 @@ const navs = {
 let currentSelectedBC = null;
 let currentActiveShareId = null;
 let currentShowCombined = false;
+
+function updateSidebarToggleButton() {
+    const toggleBtn = document.getElementById('sidebar-toggle-btn');
+    if (!toggleBtn) return;
+    const collapsed = appScreen && appScreen.classList.contains('sidebar-collapsed');
+    toggleBtn.textContent = collapsed ? '☰' : '✕';
+    toggleBtn.title = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+    toggleBtn.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+}
+
+function applySidebarState() {
+    if (!appScreen) return;
+    const stored = localStorage.getItem('bc_sidebar_collapsed');
+    const isMobile = window.innerWidth <= 768;
+    const shouldCollapse = stored === 'true' || (stored === null && isMobile);
+    appScreen.classList.toggle('sidebar-collapsed', shouldCollapse);
+    updateSidebarToggleButton();
+}
+
+function toggleSidebar() {
+    if (!appScreen) return;
+    const nextState = !appScreen.classList.contains('sidebar-collapsed');
+    appScreen.classList.toggle('sidebar-collapsed', nextState);
+    localStorage.setItem('bc_sidebar_collapsed', String(nextState));
+    updateSidebarToggleButton();
+}
 
 // ---------- Theme ----------
 function applyTheme(theme) {
@@ -37,6 +64,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     const themeBtn = document.getElementById('theme-toggle-btn');
     if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+
+    const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+    if (sidebarToggleBtn) sidebarToggleBtn.addEventListener('click', toggleSidebar);
+    applySidebarState();
+    window.addEventListener('resize', applySidebarState);
 });
 
 // View Navigation Logic

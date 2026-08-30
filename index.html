@@ -22,11 +22,14 @@
     <!-- App Layout -->
     <div id="app-screen" class="screen hidden layout">
         <aside class="sidebar">
-            <h2>BC Manager</h2>
-            <nav>
-                <a href="#" id="nav-dashboard" class="active">Dashboard</a>
-                <a href="#" id="nav-reports">Monthly Reports</a>
-                <a href="#" id="logout-btn" style="margin-top: auto;">Logout</a>
+            <div class="sidebar-header">
+                <h2>BC Manager</h2>
+                <button id="sidebar-toggle-btn" class="secondary sidebar-toggle" type="button" aria-label="Collapse sidebar">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" id="nav-dashboard" class="active"><span class="nav-icon">🏠</span><span class="nav-text">Dashboard</span></a>
+                <a href="#" id="nav-reports"><span class="nav-icon">📊</span><span class="nav-text">Monthly Reports</span></a>
+                <a href="#" id="logout-btn" style="margin-top: auto;"><span class="nav-icon">🚪</span><span class="nav-text">Logout</span></a>
             </nav>
             <button id="theme-toggle-btn" class="secondary" style="margin-top:16px;">☀️</button>
         </aside>
